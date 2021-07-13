@@ -1,45 +1,21 @@
-import 'dart:convert';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:http/http.dart' as http;
+import 'package:toggle_switch/toggle_switch.dart';
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  print('Handling a background message ${message.messageId}');
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-  if (!kIsWeb) {
-    var channel = const AndroidNotificationChannel(
-      'high_importance_channel', // id
-      'High Importance Notifications', // title
-      'This channel is used for important notifications.', // description
-      importance: Importance.high,
-    );
-
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
-
-    await FirebaseMessaging.instance
-        .setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-  }
-
   runApp(MyApp());
 }
 
@@ -56,23 +32,6 @@ class MyApp extends StatelessWidget {
       home: MyStatefulWidget(),
     );
   }
-}
-
-int _messageCount = 0;
-
-String constructFCMPayload(String token) {
-  _messageCount++;
-  return jsonEncode({
-    'token': token,
-    'data': {
-      'via': 'FlutterFire Cloud Messaging!',
-      'count': _messageCount.toString(),
-    },
-    'notification': {
-      'title': 'Hello FlutterFire!',
-      'body': 'This notification (#$_messageCount) was created via FCM!',
-    },
-  });
 }
 
 class MyStatefulWidget extends StatefulWidget {
@@ -134,21 +93,6 @@ class _MyHomePageState extends State<MyHomePage> {
       print('A new onMessageOpenedApp event was published!');
     });
   }
-
-  Future<void> sendPushMessage() async {
-    try {
-      await http.post(Uri.parse('https://api.rnfirebase.io/messaging/send'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8'
-          },
-          body: constructFCMPayload(
-              "BCNZidrD-kVFZPzkX0SlD4ydG7P-UqPimuoh-hK8Lxaoqz_KIDf7zAz6Coo3RI8zKd9AGHzwJBAgoZszqGqBYHM"));
-      print('FCM request for device sent!');
-    } catch (e) {
-      print(e);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -172,6 +116,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPage extends State<SettingsPage> {
+  int subStatus = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -187,11 +132,40 @@ class _SettingsPage extends State<SettingsPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 80.0),
+              child: Text(
+                'What would like to do?',
+                style: TextStyle(fontWeight: FontWeight.normal),
+              ),
+            ),
+            ToggleSwitch(
+              minWidth: 120.0,
+              initialLabelIndex: 0,
+              cornerRadius: 20.0,
+              activeFgColor: Colors.white,
+              inactiveBgColor: Colors.blueGrey,
+              inactiveFgColor: Colors.white,
+              totalSwitches: 2,
+              labels: ['Subscribe', 'Unsubscribe'],
+              icons: [CupertinoIcons.hand_thumbsup, CupertinoIcons.hand_thumbsdown],
+              activeBgColors: [[Colors.blueAccent],[Colors.blueAccent]],
+              onToggle: (index) {
+                subStatus = index;
+              },
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 80.0),
+              child: Text(
+                'Select Topics:',
+                style: TextStyle(fontWeight: FontWeight.normal),
+              ),
+            ),
             Card(
-              margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 40.0),
+              margin: EdgeInsets.symmetric(vertical: 1.0, horizontal: 80.0),
               child: ListTile(
                 leading:
-                    Icon(Icons.announcement_rounded, color: Colors.redAccent),
+                    Icon(CupertinoIcons.checkmark_seal_fill, color: Colors.redAccent),
                 title: Text(
                   'Quit Smoking',
                   style: TextStyle(
@@ -199,14 +173,19 @@ class _SettingsPage extends State<SettingsPage> {
                   ),
                 ),
                 onTap: () {
-                  FirebaseMessaging.instance.subscribeToTopic('QuitSmoking');
+                  if (subStatus == 0) {
+                    FirebaseMessaging.instance.subscribeToTopic('QuitSmoking');
+                  }
+                  if (subStatus == 1){
+                    FirebaseMessaging.instance.unsubscribeFromTopic('QuitSmoking');
+                  }
                 },
               ),
             ),
             Card(
-              margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 40.0),
+              margin: EdgeInsets.symmetric(vertical: 1.0, horizontal: 80.0),
               child: ListTile(
-                leading: Icon(Icons.announcement_rounded, color: Colors.green),
+                leading: Icon(CupertinoIcons.paperclip, color: Colors.green),
                 title: Text(
                   'Study Exams',
                   style: TextStyle(
@@ -214,15 +193,20 @@ class _SettingsPage extends State<SettingsPage> {
                   ),
                 ),
                 onTap: () {
-                  FirebaseMessaging.instance.subscribeToTopic('StudyExams');
+                  if (subStatus == 0) {
+                    FirebaseMessaging.instance.subscribeToTopic('StudyExams');
+                  }
+                  if (subStatus == 1){
+                    FirebaseMessaging.instance.unsubscribeFromTopic('StudyExams');
+                  }
                 },
               ),
             ),
             Card(
-              margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 40.0),
+              margin: EdgeInsets.symmetric(vertical: 1.0, horizontal: 80.0),
               child: ListTile(
                 leading:
-                    Icon(Icons.announcement_rounded, color: Colors.pinkAccent),
+                    Icon(CupertinoIcons.heart_slash_fill, color: Colors.pinkAccent),
                 title: Text(
                   'Love Problems',
                   style: TextStyle(
@@ -230,7 +214,12 @@ class _SettingsPage extends State<SettingsPage> {
                   ),
                 ),
                 onTap: () {
-                  FirebaseMessaging.instance.subscribeToTopic('LoveProblems');
+                  if (subStatus == 0) {
+                    FirebaseMessaging.instance.subscribeToTopic('LoveProblems');
+                  }
+                  if (subStatus == 1){
+                    FirebaseMessaging.instance.unsubscribeFromTopic('LoveProblems');
+                  }
                 },
               ),
             ),
