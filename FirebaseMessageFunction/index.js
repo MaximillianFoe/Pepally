@@ -5,13 +5,18 @@ const serviceAccount = require('./pepally-ieu-firebase-adminsdk-kzzor-4008bca5fb
 admin.initializeApp({credential: admin.credential.cert(serviceAccount)});
 const database = admin.firestore();
 
+function RandomNumber(min, max) {
+    return Math.floor(
+        Math.random() * (max - min) + min
+    )
+}
+
 async function sendNotif(topic, payload, options = {}){
-    // https://www.techotopia.com/index.php/Sending_Firebase_Cloud_Messages_from_a_Node.js_Server
     return await admin.messaging().sendToTopic(topic, payload, options);
 }
 
-exports.LoveProblems = functions.region('us-central1').pubsub.schedule('0 */6 * * *').onRun(async () => {
-    const LoveProblemsPayLoad = await database.collection('LoveProblems').doc('0').get();
+exports.LoveProblems = functions.region('europe-west1').pubsub.schedule('0 0-22/2 * * *').onRun(async () => {
+    const LoveProblemsPayLoad = await database.collection('LoveProblems').doc(RandomNumber(0,5).toString()).get();
         const resp = await sendNotif('QuitSmoking', {
             notification: {
                 title: LoveProblemsPayLoad.data().Title,
@@ -21,8 +26,8 @@ exports.LoveProblems = functions.region('us-central1').pubsub.schedule('0 */6 * 
         console.log(resp);
 });
 
-exports.QuitSmoking = functions.region('us-central1').pubsub.schedule('0 */6 * * *').onRun(async () => {
-    const QuitSmokingPayLoad = await database.collection('QuitSmoking').doc('0').get();
+exports.QuitSmoking = functions.region('europe-west1').pubsub.schedule('0 0-22/2 * * *').onRun(async () => {
+    const QuitSmokingPayLoad = await database.collection('QuitSmoking').doc(RandomNumber(0,5).toString()).get();
     const resp = await sendNotif('QuitSmoking', {
         notification: {
             title: QuitSmokingPayLoad.data().Title,
@@ -32,8 +37,8 @@ exports.QuitSmoking = functions.region('us-central1').pubsub.schedule('0 */6 * *
     console.log(resp);
 });
 
-exports.StudyExams = functions.region('us-central1').pubsub.schedule('0 */6 * * *').onRun(async () => {
-    const StudyExamsPayLoad = await database.collection('StudyExams').doc('0').get();
+exports.StudyExams = functions.region('europe-west1').pubsub.schedule('0 0-22/2 * * *').onRun(async () => {
+    const StudyExamsPayLoad = await database.collection('StudyExams').doc(RandomNumber(0,5).toString()).get();
     const resp = await sendNotif('QuitSmoking', {
         notification: {
             title: StudyExamsPayLoad.data().Title,
