@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -227,10 +228,20 @@ class _SettingsPage extends State<SettingsPage> {
                 onTap: () {
                   if (subStatus == 0) {
                     FirebaseMessaging.instance.subscribeToTopic('QuitSmoking');
+                    Fluttertoast.cancel();
+                    Fluttertoast.showToast(
+                      msg: "Succesfully Subscribed to Topic!",
+                      toastLength: Toast.LENGTH_SHORT,
+                    );
                   }
                   if (subStatus == 1) {
                     FirebaseMessaging.instance
                         .unsubscribeFromTopic('QuitSmoking');
+                    Fluttertoast.cancel();
+                    Fluttertoast.showToast(
+                      msg: "Succesfully Unsubscribed from Topic!",
+                      toastLength: Toast.LENGTH_SHORT,
+                    );
                   }
                 },
               ),
@@ -248,10 +259,20 @@ class _SettingsPage extends State<SettingsPage> {
                 onTap: () {
                   if (subStatus == 0) {
                     FirebaseMessaging.instance.subscribeToTopic('StudyExams');
+                    Fluttertoast.cancel();
+                    Fluttertoast.showToast(
+                      msg: "Succesfully Subscribed to Topic!",
+                      toastLength: Toast.LENGTH_SHORT,
+                    );
                   }
                   if (subStatus == 1) {
                     FirebaseMessaging.instance
                         .unsubscribeFromTopic('StudyExams');
+                    Fluttertoast.cancel();
+                    Fluttertoast.showToast(
+                      msg: "Succesfully Unsubscribed from Topic!",
+                      toastLength: Toast.LENGTH_SHORT,
+                    );
                   }
                 },
               ),
@@ -270,10 +291,20 @@ class _SettingsPage extends State<SettingsPage> {
                 onTap: () {
                   if (subStatus == 0) {
                     FirebaseMessaging.instance.subscribeToTopic('LoveProblems');
+                    Fluttertoast.cancel();
+                    Fluttertoast.showToast(
+                      msg: "Succesfully Subscribed to Topic!",
+                      toastLength: Toast.LENGTH_SHORT,
+                    );
                   }
                   if (subStatus == 1) {
                     FirebaseMessaging.instance
                         .unsubscribeFromTopic('LoveProblems');
+                    Fluttertoast.cancel();
+                    Fluttertoast.showToast(
+                      msg: "Succesfully Unsubscribed from Topic!",
+                      toastLength: Toast.LENGTH_SHORT,
+                    );
                   }
                 },
               ),
