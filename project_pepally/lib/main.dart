@@ -1,4 +1,5 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -143,12 +144,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+
   @override
   void initState() {
     super.initState();
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('A new onMessageOpenedApp event was published!');
-    });
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {});
+  }
+
+  playKitty() async {
+    int result = await audioPlayer.play("assets/KittyMeow.mp3", isLocal: true);
+    if (result == 1) {
+      print("Kitty meows!");
+    }
   }
 
   @override
@@ -161,43 +169,60 @@ class _MyHomePageState extends State<MyHomePage> {
         elevation: 0.0,
       ),
       backgroundColor: Colors.deepOrange,
-      body: Center(
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 5.0, horizontal: 80.0),
-                child: DefaultTextStyle(
-                  style: const TextStyle(
-                    fontSize: 30.0,
-                    fontFamily: 'Agne',
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('ills/BackgroundTile.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Center(
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  width: 332.0,
+                  height: 83.0,
+                  child: DefaultTextStyle(
+                    style: const TextStyle(
+                      fontSize: 22.0,
+                      fontFamily: 'Agne',
+                    ),
+                    child: AnimatedTextKit(
+                      animatedTexts: [
+                        TypewriterAnimatedText(homeQuote),
+                      ],
+                      isRepeatingAnimation: false,
+                      onTap: () {
+                        Fluttertoast.cancel();
+                        Fluttertoast.showToast(
+                          msg: homeQuote,
+                          toastLength: Toast.LENGTH_SHORT,
+                        );
+                      },
+                    ),
                   ),
-                  child: AnimatedTextKit(
-                    animatedTexts: [
-                      TypewriterAnimatedText(homeQuote),
-                    ],
-                    isRepeatingAnimation: false,
+                ),
+                GestureDetector(
                     onTap: () {
+                      playKitty();
                       Fluttertoast.cancel();
                       Fluttertoast.showToast(
-                        msg: homeQuote,
+                        msg: "Kitty Loves You!",
                         toastLength: Toast.LENGTH_SHORT,
                       );
                     },
-                  ),
-                ),
-              ),
-              new Container(
-                  width: 332.0,
-                  height: 223.0,
-                  decoration: new BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: new DecorationImage(
-                          fit: BoxFit.fill,
-                          image: new AssetImage('ills/SplashCatFinal.png')))),
-            ]),
+                    child: Container(
+                        width: 332.0,
+                        height: 223.0,
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                                fit: BoxFit.fill,
+                                image:
+                                    AssetImage('ills/SplashCatFinal.png'))))),
+              ]),
+        ),
       ),
     );
   }
