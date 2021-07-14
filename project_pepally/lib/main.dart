@@ -30,6 +30,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 String homeQuote = "Pepally";
+const kittySound = "KittyMeow.mp3";
 
 class _SplashScreen extends State<SplashScreen> {
   Future<void> getData() async {
@@ -152,13 +153,6 @@ class _MyHomePageState extends State<MyHomePage> {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {});
   }
 
-  playKitty() async {
-    int result = await audioPlayer.play("assets/KittyMeow.mp3", isLocal: true);
-    if (result == 1) {
-      print("Kitty meows!");
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -206,10 +200,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 GestureDetector(
                     onTap: () {
-                      playKitty();
+                      audioPlayer.play(kittySound);
                       Fluttertoast.cancel();
                       Fluttertoast.showToast(
-                        msg: "Kitty Loves You!",
+                        msg: "Kitty meows!",
                         toastLength: Toast.LENGTH_SHORT,
                       );
                     },
@@ -246,144 +240,156 @@ class _SettingsPage extends State<SettingsPage> {
         elevation: 0.0,
       ),
       backgroundColor: Colors.deepOrange,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 80.0),
-              child: Text(
-                'What would like to do?',
-                style: TextStyle(fontWeight: FontWeight.normal),
-              ),
-            ),
-            ToggleSwitch(
-              minWidth: 120.0,
-              initialLabelIndex: 0,
-              cornerRadius: 20.0,
-              activeFgColor: Colors.white,
-              inactiveBgColor: Colors.blueGrey,
-              inactiveFgColor: Colors.white,
-              totalSwitches: 2,
-              labels: ['Subscribe', 'Unsubscribe'],
-              icons: [
-                CupertinoIcons.hand_thumbsup,
-                CupertinoIcons.hand_thumbsdown
-              ],
-              activeBgColors: [
-                [Colors.blueAccent],
-                [Colors.blueAccent]
-              ],
-              onToggle: (index) {
-                subStatus = index;
-              },
-            ),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 80.0),
-              child: Text(
-                'Select Topics:',
-                style: TextStyle(fontWeight: FontWeight.normal),
-              ),
-            ),
-            Card(
-              margin: EdgeInsets.symmetric(vertical: 1.0, horizontal: 80.0),
-              child: ListTile(
-                leading: Icon(CupertinoIcons.checkmark_seal_fill,
-                    color: Colors.redAccent),
-                title: Text(
-                  'Quit Smoking',
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('ills/BackgroundTile.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 5.0, horizontal: 80.0),
+                child: Text(
+                  'What would like to do?',
                   style: TextStyle(
-                    color: Colors.redAccent,
-                  ),
+                      fontWeight: FontWeight.normal, color: Colors.white),
                 ),
-                onTap: () {
-                  if (subStatus == 0) {
-                    FirebaseMessaging.instance.subscribeToTopic('QuitSmoking');
-                    Fluttertoast.cancel();
-                    Fluttertoast.showToast(
-                      msg: "Succesfully Subscribed to Topic!",
-                      toastLength: Toast.LENGTH_SHORT,
-                    );
-                  }
-                  if (subStatus == 1) {
-                    FirebaseMessaging.instance
-                        .unsubscribeFromTopic('QuitSmoking');
-                    Fluttertoast.cancel();
-                    Fluttertoast.showToast(
-                      msg: "Succesfully Unsubscribed from Topic!",
-                      toastLength: Toast.LENGTH_SHORT,
-                    );
-                  }
+              ),
+              ToggleSwitch(
+                minWidth: 120.0,
+                initialLabelIndex: 0,
+                cornerRadius: 20.0,
+                activeFgColor: Colors.white,
+                inactiveBgColor: Colors.blueGrey,
+                inactiveFgColor: Colors.white,
+                totalSwitches: 2,
+                labels: ['Subscribe', 'Unsubscribe'],
+                icons: [
+                  CupertinoIcons.hand_thumbsup,
+                  CupertinoIcons.hand_thumbsdown
+                ],
+                activeBgColors: [
+                  [Colors.blueAccent],
+                  [Colors.blueAccent]
+                ],
+                onToggle: (index) {
+                  subStatus = index;
                 },
               ),
-            ),
-            Card(
-              margin: EdgeInsets.symmetric(vertical: 1.0, horizontal: 80.0),
-              child: ListTile(
-                leading: Icon(CupertinoIcons.paperclip, color: Colors.green),
-                title: Text(
-                  'Study Exams',
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 5.0, horizontal: 80.0),
+                child: Text(
+                  'Select Topics:',
                   style: TextStyle(
-                    color: Colors.green,
-                  ),
+                      fontWeight: FontWeight.normal, color: Colors.white),
                 ),
-                onTap: () {
-                  if (subStatus == 0) {
-                    FirebaseMessaging.instance.subscribeToTopic('StudyExams');
-                    Fluttertoast.cancel();
-                    Fluttertoast.showToast(
-                      msg: "Succesfully Subscribed to Topic!",
-                      toastLength: Toast.LENGTH_SHORT,
-                    );
-                  }
-                  if (subStatus == 1) {
-                    FirebaseMessaging.instance
-                        .unsubscribeFromTopic('StudyExams');
-                    Fluttertoast.cancel();
-                    Fluttertoast.showToast(
-                      msg: "Succesfully Unsubscribed from Topic!",
-                      toastLength: Toast.LENGTH_SHORT,
-                    );
-                  }
-                },
               ),
-            ),
-            Card(
-              margin: EdgeInsets.symmetric(vertical: 1.0, horizontal: 80.0),
-              child: ListTile(
-                leading: Icon(CupertinoIcons.heart_slash_fill,
-                    color: Colors.pinkAccent),
-                title: Text(
-                  'Love Problems',
-                  style: TextStyle(
-                    color: Colors.pinkAccent,
+              Card(
+                margin: EdgeInsets.symmetric(vertical: 1.0, horizontal: 80.0),
+                child: ListTile(
+                  leading: Icon(CupertinoIcons.checkmark_seal_fill,
+                      color: Colors.redAccent),
+                  title: Text(
+                    'Quit Smoking',
+                    style: TextStyle(
+                      color: Colors.redAccent,
+                    ),
                   ),
+                  onTap: () {
+                    if (subStatus == 0) {
+                      FirebaseMessaging.instance
+                          .subscribeToTopic('QuitSmoking');
+                      Fluttertoast.cancel();
+                      Fluttertoast.showToast(
+                        msg: "Succesfully Subscribed to Topic!",
+                        toastLength: Toast.LENGTH_SHORT,
+                      );
+                    }
+                    if (subStatus == 1) {
+                      FirebaseMessaging.instance
+                          .unsubscribeFromTopic('QuitSmoking');
+                      Fluttertoast.cancel();
+                      Fluttertoast.showToast(
+                        msg: "Succesfully Unsubscribed from Topic!",
+                        toastLength: Toast.LENGTH_SHORT,
+                      );
+                    }
+                  },
                 ),
-                onTap: () {
-                  if (subStatus == 0) {
-                    FirebaseMessaging.instance.subscribeToTopic('LoveProblems');
-                    Fluttertoast.cancel();
-                    Fluttertoast.showToast(
-                      msg: "Succesfully Subscribed to Topic!",
-                      toastLength: Toast.LENGTH_SHORT,
-                    );
-                  }
-                  if (subStatus == 1) {
-                    FirebaseMessaging.instance
-                        .unsubscribeFromTopic('LoveProblems');
-                    Fluttertoast.cancel();
-                    Fluttertoast.showToast(
-                      msg: "Succesfully Unsubscribed from Topic!",
-                      toastLength: Toast.LENGTH_SHORT,
-                    );
-                  }
-                },
               ),
-            ),
-          ],
+              Card(
+                margin: EdgeInsets.symmetric(vertical: 1.0, horizontal: 80.0),
+                child: ListTile(
+                  leading: Icon(CupertinoIcons.paperclip, color: Colors.green),
+                  title: Text(
+                    'Study Exams',
+                    style: TextStyle(
+                      color: Colors.green,
+                    ),
+                  ),
+                  onTap: () {
+                    if (subStatus == 0) {
+                      FirebaseMessaging.instance.subscribeToTopic('StudyExams');
+                      Fluttertoast.cancel();
+                      Fluttertoast.showToast(
+                        msg: "Succesfully Subscribed to Topic!",
+                        toastLength: Toast.LENGTH_SHORT,
+                      );
+                    }
+                    if (subStatus == 1) {
+                      FirebaseMessaging.instance
+                          .unsubscribeFromTopic('StudyExams');
+                      Fluttertoast.cancel();
+                      Fluttertoast.showToast(
+                        msg: "Succesfully Unsubscribed from Topic!",
+                        toastLength: Toast.LENGTH_SHORT,
+                      );
+                    }
+                  },
+                ),
+              ),
+              Card(
+                margin: EdgeInsets.symmetric(vertical: 1.0, horizontal: 80.0),
+                child: ListTile(
+                  leading: Icon(CupertinoIcons.heart_slash_fill,
+                      color: Colors.pinkAccent),
+                  title: Text(
+                    'Love Problems',
+                    style: TextStyle(
+                      color: Colors.pinkAccent,
+                    ),
+                  ),
+                  onTap: () {
+                    if (subStatus == 0) {
+                      FirebaseMessaging.instance
+                          .subscribeToTopic('LoveProblems');
+                      Fluttertoast.cancel();
+                      Fluttertoast.showToast(
+                        msg: "Succesfully Subscribed to Topic!",
+                        toastLength: Toast.LENGTH_SHORT,
+                      );
+                    }
+                    if (subStatus == 1) {
+                      FirebaseMessaging.instance
+                          .unsubscribeFromTopic('LoveProblems');
+                      Fluttertoast.cancel();
+                      Fluttertoast.showToast(
+                        msg: "Succesfully Unsubscribed from Topic!",
+                        toastLength: Toast.LENGTH_SHORT,
+                      );
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
