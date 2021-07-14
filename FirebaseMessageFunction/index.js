@@ -15,9 +15,9 @@ async function sendNotif(topic, payload, options = {}){
     return await admin.messaging().sendToTopic(topic, payload, options);
 }
 
-exports.LoveProblems = functions.region('europe-west1').pubsub.schedule('0 0-22/2 * * *').onRun(async () => {
+exports.LoveProblems = functions.region('europe-west1').pubsub.schedule('* * * * *').onRun(async () => {
     const LoveProblemsPayLoad = await database.collection('LoveProblems').doc(RandomNumber(0,5).toString()).get();
-        const resp = await sendNotif('QuitSmoking', {
+        const resp = await sendNotif('LoveProblems', {
             notification: {
                 title: LoveProblemsPayLoad.data().Title,
                 body: LoveProblemsPayLoad.data().Body
@@ -26,7 +26,7 @@ exports.LoveProblems = functions.region('europe-west1').pubsub.schedule('0 0-22/
         console.log(resp);
 });
 
-exports.QuitSmoking = functions.region('europe-west1').pubsub.schedule('0 0-22/2 * * *').onRun(async () => {
+exports.QuitSmoking = functions.region('europe-west1').pubsub.schedule('* * * * *').onRun(async () => {
     const QuitSmokingPayLoad = await database.collection('QuitSmoking').doc(RandomNumber(0,5).toString()).get();
     const resp = await sendNotif('QuitSmoking', {
         notification: {
@@ -37,9 +37,9 @@ exports.QuitSmoking = functions.region('europe-west1').pubsub.schedule('0 0-22/2
     console.log(resp);
 });
 
-exports.StudyExams = functions.region('europe-west1').pubsub.schedule('0 0-22/2 * * *').onRun(async () => {
+exports.StudyExams = functions.region('europe-west1').pubsub.schedule('* * * * *').onRun(async () => {
     const StudyExamsPayLoad = await database.collection('StudyExams').doc(RandomNumber(0,5).toString()).get();
-    const resp = await sendNotif('QuitSmoking', {
+    const resp = await sendNotif('StudyExams', {
         notification: {
             title: StudyExamsPayLoad.data().Title,
             body: StudyExamsPayLoad.data().Body
