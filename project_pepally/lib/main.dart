@@ -1,4 +1,5 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -27,10 +28,23 @@ class SplashScreen extends StatefulWidget {
   _SplashScreen createState() => _SplashScreen();
 }
 
+String homeQuote = "Pepally";
+
 class _SplashScreen extends State<SplashScreen> {
+  Future<void> getData() async {
+    var docRef =
+        FirebaseFirestore.instance.collection('QuoteOfTheDay').doc('0');
+    var quoteOfTheDay = (await docRef.get()).data();
+    setState(() {
+      homeQuote = quoteOfTheDay!['Body'];
+      ;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    getData();
     Future.delayed(Duration(seconds: 5), () {
       Navigator.push(context, MaterialPageRoute(builder: (context) => MyApp()));
     });
@@ -46,15 +60,15 @@ class _SplashScreen extends State<SplashScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             TextLiquidFill(
-                text: 'Pepally',
-                waveColor: Colors.blueAccent,
-                boxBackgroundColor: Colors.purpleAccent,
-                textStyle: TextStyle(
-                  fontSize: 72.0,
-                  fontWeight: FontWeight.normal,
-                ),
-              boxHeight: (MediaQuery.of(context).size.height),
+              text: 'Pepally',
+              waveColor: Colors.blueAccent,
+              boxBackgroundColor: Colors.purpleAccent,
+              textStyle: TextStyle(
+                fontSize: 72.0,
+                fontWeight: FontWeight.normal,
               ),
+              boxHeight: (MediaQuery.of(context).size.height),
+            ),
           ],
         ),
       ),
@@ -148,7 +162,42 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       backgroundColor: Colors.deepOrange,
       body: Center(
-        child: Column(),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 5.0, horizontal: 80.0),
+                child: DefaultTextStyle(
+                  style: const TextStyle(
+                    fontSize: 30.0,
+                    fontFamily: 'Agne',
+                  ),
+                  child: AnimatedTextKit(
+                    animatedTexts: [
+                      TypewriterAnimatedText(homeQuote),
+                    ],
+                    isRepeatingAnimation: false,
+                    onTap: () {
+                      Fluttertoast.cancel();
+                      Fluttertoast.showToast(
+                        msg: homeQuote,
+                        toastLength: Toast.LENGTH_SHORT,
+                      );
+                    },
+                  ),
+                ),
+              ),
+              new Container(
+                  width: 332.0,
+                  height: 223.0,
+                  decoration: new BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: new DecorationImage(
+                          fit: BoxFit.fill,
+                          image: new AssetImage('ills/SplashCatFinal.png')))),
+            ]),
       ),
     );
   }
